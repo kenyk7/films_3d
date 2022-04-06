@@ -2,6 +2,8 @@
 
 A new Flutter project.
 
+- [Inspired ui design](https://dribbble.com/shots/11959061-Movie-App-MVP)
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.

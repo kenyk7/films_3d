@@ -1,7 +1,9 @@
+import 'dart:math';
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sensors/sensors.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,12 +34,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // PageController _pageController = PageController();
+  late PageController _pageCtrl;
   AccelerometerEvent acceleration = AccelerometerEvent(0, 0, 0);
   StreamSubscription<AccelerometerEvent>? _streamSubscription;
 
-  int planetMotionSensitivity = 2;
+  int personSensitivity = 2;
   int bgMotionSensitivity = 5;
+  int _selectIndex = 1;
 
   @override
   void initState() {
@@ -47,42 +50,69 @@ class _MyHomePageState extends State<MyHomePage> {
         acceleration = event;
       });
     });
+    _pageCtrl =
+        PageController(initialPage: _selectIndex, viewportFraction: 0.75);
     super.initState();
   }
 
   @override
   void dispose() {
     _streamSubscription?.cancel();
+    _pageCtrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final pages = [
+      carouselView(0),
+      carouselView(1),
+      carouselView(2),
+    ];
     return Scaffold(
-      // backgroundColor: Colors.black12,
-      // appBar: AppBar(
-      //   title: Text(widget.title),
-      // ),
       body: Container(
         padding: const EdgeInsets.only(top: 30),
         decoration: BoxDecoration(
           image: DecorationImage(
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.3), BlendMode.darken),
+              Colors.black.withOpacity(0.3),
+              BlendMode.darken,
+            ),
             image: const NetworkImage(
-              'https://i.imgur.com/9JWuT3k.jpg',
+              'https://picsum.photos/400/800?blur',
             ),
           ),
         ),
-        child: PageView(
-          // controller: _pageController,
-          children: <Widget>[
-            cardFilm(),
-            cardFilm(),
-          ],
+        child: PageView.builder(
+          onPageChanged: (index) {
+            setState(() {
+              _selectIndex = index;
+            });
+          },
+          controller: _pageCtrl,
+          itemCount: pages.length,
+          itemBuilder: (_, index) {
+            return pages[index];
+          },
         ),
       ),
+    );
+  }
+
+  Widget carouselView(int index) {
+    var _scale = _selectIndex == index ? 1.0 : 0.9;
+    return TweenAnimationBuilder(
+      duration: const Duration(milliseconds: 350),
+      tween: Tween(begin: _scale, end: _scale),
+      curve: Curves.ease,
+      child: cardFilm(),
+      builder: (context, double value, child) {
+        return Transform.scale(
+          scale: value,
+          child: child,
+        );
+      },
     );
   }
 
@@ -90,16 +120,16 @@ class _MyHomePageState extends State<MyHomePage> {
     const deep = 60;
     return Center(
       child: SizedBox(
-        height: 600,
+        height: 520,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 32),
           child: Card(
             elevation: 10,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
               child: Stack(
                 children: [
                   AnimatedPositioned(
@@ -113,26 +143,42 @@ class _MyHomePageState extends State<MyHomePage> {
                       fit: BoxFit.cover,
                     ),
                   ),
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.25),
+                          Colors.black.withOpacity(0.75),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                  ),
                   AnimatedPositioned(
                     duration: const Duration(milliseconds: 250),
-                    // top: acceleration.z * planetMotionSensitivity,
-                    bottom: acceleration.z * -planetMotionSensitivity,
-                    right: acceleration.x * -planetMotionSensitivity,
-                    left: acceleration.x * planetMotionSensitivity,
+                    // top: acceleration.z * personSensitivity,
+                    bottom: acceleration.z * -personSensitivity,
+                    right: acceleration.x * -personSensitivity,
+                    left: acceleration.x * personSensitivity,
                     child: Image.network('https://i.imgur.com/P6Kwdk7.png'),
                   ),
-                  Positioned(
-                    left: 24,
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 250),
+                    left: acceleration.x * -personSensitivity + 24,
                     bottom: 24,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         const Text(
-                          'Iroman',
+                          'IROMAN',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 32,
+                            fontSize: 28,
                             fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
                           ),
                         ),
                         Row(
@@ -141,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               '5.0',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 22,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),

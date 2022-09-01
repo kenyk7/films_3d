@@ -2,7 +2,7 @@
 
 A new Flutter project.
 
-- [Inspired ui design](https://dribbble.com/shots/11959061-Movie-App-MVP)
+- [Inspired design](https://dribbble.com/shots/11959061-Movie-App-MVP)
 
 ## Getting Started
 

@@ -20,20 +20,52 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
       ),
-      home: const MyHomePage(title: 'My 3d Films'),
+      home: const MyHome(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-  final String title;
-
+class MyHome extends StatelessWidget {
+  const MyHome({Key? key}) : super(key: key);
+  // This widget is the root of your application.
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        body: DecoratedBox(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                Colors.black.withOpacity(0.3),
+                BlendMode.darken,
+              ),
+              image: const NetworkImage(
+                'https://picsum.photos/id/1002/400/800?blur',
+              ),
+            ),
+          ),
+          child: ListView(
+            children: const [
+              CarouselSection(),
+              CarouselSection(),
+              CarouselSection(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class CarouselSection extends StatefulWidget {
+  const CarouselSection({Key? key}) : super(key: key);
+
+  @override
+  State<CarouselSection> createState() => _CarouselSectionState();
+}
+
+class _CarouselSectionState extends State<CarouselSection> {
   late PageController _pageCtrl;
   AccelerometerEvent acceleration = AccelerometerEvent(0, 0, 0);
   StreamSubscription<AccelerometerEvent>? _streamSubscription;
@@ -68,34 +100,21 @@ class _MyHomePageState extends State<MyHomePage> {
       carouselView(0),
       carouselView(1),
       carouselView(2),
+      carouselView(3),
     ];
-    return Scaffold(
-      body: Container(
-        padding: const EdgeInsets.only(top: 30),
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.3),
-              BlendMode.darken,
-            ),
-            image: const NetworkImage(
-              'https://picsum.photos/400/800?blur',
-            ),
-          ),
-        ),
-        child: PageView.builder(
-          onPageChanged: (index) {
-            setState(() {
-              _selectIndex = index;
-            });
-          },
-          controller: _pageCtrl,
-          itemCount: pages.length,
-          itemBuilder: (_, index) {
-            return pages[index];
-          },
-        ),
+    return SizedBox(
+      height: 520,
+      child: PageView.builder(
+        onPageChanged: (index) {
+          setState(() {
+            _selectIndex = index;
+          });
+        },
+        controller: _pageCtrl,
+        itemCount: pages.length,
+        itemBuilder: (_, index) {
+          return pages[index];
+        },
       ),
     );
   }
@@ -124,7 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 32),
           child: Card(
-            elevation: 10,
+            elevation: 15,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
